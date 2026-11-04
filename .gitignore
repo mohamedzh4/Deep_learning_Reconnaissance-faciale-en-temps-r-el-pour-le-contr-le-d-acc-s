@@ -3,6 +3,7 @@ __pycache__/
 .venv/
 .pytest_cache/
 .DS_Store
+.streamlit/secrets.toml
 data/*
 !data/.gitkeep
 models/*

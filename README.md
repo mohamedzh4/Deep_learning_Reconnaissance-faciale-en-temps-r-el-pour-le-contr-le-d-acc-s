@@ -63,6 +63,25 @@ Then set `model.use_gpu: true` in `config.yaml`.
 
 All commands below work on **macOS, Linux, and Windows** (CMD or PowerShell).
 
+### ▶ Launch the Web Dashboard (recommended)
+```bash
+streamlit run app.py
+```
+Then open http://localhost:8501 in your browser.
+
+The dashboard includes:
+| Page | Description |
+|---|---|
+| 🏠 Dashboard | KPIs, today's stats, recent events chart |
+| 👥 Gallery | Enroll new users via webcam snapshots, remove users |
+| 🎥 Live Control | Real-time face recognition with live camera feed |
+| 📋 Audit Log | Filterable event table + CSV export |
+| ⚙️ Settings | Edit all config.yaml parameters from the UI |
+
+### ⌨️ CLI commands (alternative)
+
+### ⌨️ CLI commands (alternative)
+
 ### Enroll users (webcam)
 ```bash
 python scripts/enroll_user.py --name alice    # consent required
