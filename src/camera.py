@@ -43,5 +43,9 @@ def open_camera(cfg):
     if sys.platform == "darwin":
         hint = ("\nmacOS: System Settings > Privacy & Security > Camera > enable your terminal app "
                 "(Terminal / iTerm / VS Code / Cursor), then quit and reopen it.")
+    elif sys.platform == "win32":
+        hint = ("\nWindows: check that no other app (Teams, Zoom…) is using the camera. "
+                "Try a different index with --camera 1. "
+                "If running in a VM, make sure USB camera passthrough is enabled.")
     raise SystemExit(f"Cannot read from camera index {c['index']}. "
                      f"Set camera.index in config.yaml to try another one.{hint}")
