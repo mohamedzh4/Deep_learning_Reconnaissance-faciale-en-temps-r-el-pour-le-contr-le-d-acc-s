@@ -33,15 +33,9 @@ st.set_page_config(
 # ─────────────────────────────────────────────────────────────────────────────
 # Compatibility helper — works on old AND new Streamlit versions
 # ─────────────────────────────────────────────────────────────────────────────
-import streamlit as _st
-_st_version = tuple(int(x) for x in _st.__version__.split(".")[:2])
-
-def show_image(placeholder, img_array, **kwargs):
-    """Display an image; use the right kwarg for the installed Streamlit version."""
-    if _st_version >= (1, 25):
-        placeholder.image(img_array, use_container_width=True)
-    else:
-        placeholder.image(img_array, use_column_width=True)
+def show_image(placeholder, img_array):
+    """Display an image — use_column_width works on ALL Streamlit versions."""
+    placeholder.image(img_array, use_column_width=True)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -308,7 +302,6 @@ elif page == "👥  Gallery":
 
         col_start, col_cancel = st.columns(2)
         start_enroll  = col_start.button("🎥 Start Recording", type="primary",
-                                          use_container_width=False if _st_version < (1, 25) else True,
                                           disabled=not enroll_name.strip())
         cancel_enroll = col_cancel.button("✖ Cancel", disabled=not st.session_state.enroll_running)
 
