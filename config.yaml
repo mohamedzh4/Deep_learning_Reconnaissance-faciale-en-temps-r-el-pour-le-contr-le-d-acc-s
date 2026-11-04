@@ -1,30 +1,25 @@
 camera:
-  index: 0
+  index: 1
   width: 640
   height: 480
-
 model:
-  name: buffalo_s        # buffalo_s = fast (CPU-friendly); buffalo_l = more accurate (GPU recommended)
-  det_size: [320, 320]
-  use_gpu: false         # true needs onnxruntime-gpu + CUDA
-
+  name: buffalo_s
+  det_size:
+  - 320
+  - 320
+  use_gpu: false
 matching:
-  threshold: 0.40        # cosine similarity; calibrate with scripts/calibrate_threshold.py
-
+  threshold: 0.4
 decision:
-  window: 5              # frames considered
-  min_votes: 3           # same identity in >= min_votes of the last `window` processed frames
-  cooldown_s: 5          # min seconds between two events for the same identity
-
+  window: 5
+  min_votes: 3
+  cooldown_s: 5
 door:
   open_seconds: 3
-
 runtime:
-  process_every: 2       # run the model every N frames (raise it if FPS is low)
-
+  process_every: 2
 enroll:
-  n_templates: 5         # first N images of each person build the template; the rest are test probes
-
+  n_templates: 5
 paths:
   gallery: data/enrollment/gallery.npz
   own_dataset: data/own_dataset
