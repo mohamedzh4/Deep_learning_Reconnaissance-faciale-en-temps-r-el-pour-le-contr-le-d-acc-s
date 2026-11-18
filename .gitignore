@@ -1,12 +1,69 @@
+# Python artifacts
 __pycache__/
-*.pyc
-.venv/
+**/__pycache__/
+*.py[cod]
+*$py.class
+*.so
 .pytest_cache/
+**/.pytest_cache/
+
+# Environments
+.venv/
+**/.venv/
+env/
+venv/
+ENV/
+
+# OS files
 .DS_Store
+**/.DS_Store
+Thumbs.db
+
+# Secrets & Config
 .streamlit/secrets.toml
+
+# Databases & Backups
+*.sqlite
+*.db
+*.bak*
+
+# Archives & Large Weights
+*.zip
+*.tar.gz
+*.tar
+*.pt
+*.pth
+
+# Project data folders
 data/*
 !data/.gitkeep
+!data/enrollment/
+data/enrollment/*
+!data/enrollment/.gitkeep
+!data/own_dataset/
+data/own_dataset/*
+!data/own_dataset/.gitkeep
+!data/liveness/
+data/liveness/*
+!data/liveness/.gitkeep
+
+# Models: track custom models & gitkeeps, ignore downloaded weights (e.g. buffalo_s)
 models/*
 !models/.gitkeep
+!models/recognition/
+!models/recognition/.gitkeep
+!models/recognition/*.onnx
+!models/liveness/
+!models/liveness/.gitkeep
+!models/liveness/*.onnx
+
+# Evaluation outputs
 evaluation/results/*
 !evaluation/results/.gitkeep
+
+# Face training artifacts
+face-training/data/*
+!face-training/data/.gitkeep
+face-training/runs/
+face-training/exports/
+face-training/data.zip

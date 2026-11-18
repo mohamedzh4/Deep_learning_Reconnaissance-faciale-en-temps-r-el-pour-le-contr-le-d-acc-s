@@ -28,3 +28,4 @@ class AccessDecision:
         if top == "unknown":
             return "DENIED", None
         return "GRANTED", top
+

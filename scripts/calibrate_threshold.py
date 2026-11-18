@@ -2,7 +2,6 @@
 Probes = images not used for templates + all images of '_*' impostor folders.
 Usage: python scripts/calibrate_threshold.py --far 0.01 [--write]"""
 import argparse
-import re
 import sys
 from pathlib import Path
 
@@ -16,7 +15,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.metrics import auc, roc_curve
 
-from src.config import ROOT, load_config
+from src.config import ROOT, load_config, set_yaml_value
 from src.face_engine import FaceEngine
 from src.gallery import Gallery
 
@@ -35,6 +34,7 @@ def main():
     gallery = Gallery.load(ROOT / cfg["paths"]["gallery"])
     if len(gallery) == 0:
         sys.exit("Gallery is empty: enroll people first.")
+    gallery.check_model(engine.model_id)
     n_t = cfg["enroll"]["n_templates"]
 
     X, y = [], []
@@ -77,11 +77,10 @@ def main():
 
     if args.write:
         cfg_path = Path(args.config) if args.config else ROOT / "config.yaml"
-        text = cfg_path.read_text(encoding="utf-8")
-        text = re.sub(r"(^\s*threshold:\s*)[0-9.]+", lambda m: f"{m.group(1)}{t:.3f}", text, count=1, flags=re.M)
-        cfg_path.write_text(text, encoding="utf-8")
-        print(f"threshold written to {cfg_path}")
+        set_yaml_value(cfg_path, "matching", "threshold", f"{t:.3f}")
+        print(f"matching.threshold written to {cfg_path}")
 
 
 if __name__ == "__main__":
     main()
+

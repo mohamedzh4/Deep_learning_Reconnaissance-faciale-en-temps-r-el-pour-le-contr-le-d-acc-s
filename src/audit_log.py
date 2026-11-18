@@ -22,3 +22,4 @@ class AuditLog:
 
     def close(self):
         self.db.close()
+

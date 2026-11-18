@@ -9,3 +9,4 @@ def identify(embedding, gallery, threshold):
     i = int(np.argmax(sims))
     score = float(sims[i])
     return (gallery.names[i] if score >= threshold else None), score
+

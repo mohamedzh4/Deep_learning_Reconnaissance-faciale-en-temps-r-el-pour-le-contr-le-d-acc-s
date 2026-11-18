@@ -1,181 +1,127 @@
-# Face Access Control (local, MVP)
+# Face Access Control — Version Finale
 
-Real-time face recognition for access control: webcam → detect/align → ArcFace embedding → cosine match → multi-frame vote → door (simulated) + audit log.
-Pretrained InsightFace models (`buffalo_s` fast / `buffalo_l` accurate), downloaded automatically into `./models` on first run.
-
----
-
-## ⚙️ Prerequisites
-
-| | macOS | Windows | Linux |
-|---|---|---|---|
-| **Python** | 3.10 or 3.11 | 3.10 or 3.11 | 3.10 or 3.11 |
-| **C++ compiler** | Xcode CLT (`xcode-select --install`) | [Microsoft C++ Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) ← **required for insightface** | `build-essential` (`sudo apt install build-essential`) |
-| **GPU (optional)** | — (Metal not supported by ONNX) | CUDA 11.8+ + `onnxruntime-gpu` | CUDA 11.8+ + `onnxruntime-gpu` |
-
-> **⚠️ Windows users** must install **Microsoft C++ Build Tools** *before* running `pip install -r requirements.txt`.
-> During installation tick **"Desktop development with C++"**.
-> Download: https://visualstudio.microsoft.com/visual-cpp-build-tools/
+Système complet de contrôle d'accès biométrique facial en temps réel combinant détection, anti-usurpation (liveness detection), reconnaissance faciale personnalisée (ArcFace ONNX) et vote temporel multi-images.
 
 ---
 
-## 🛠️ Setup
+## ⚙️ Architecture globale
 
-### 1 — Create a virtual environment
+```
+Flux Vidéo Webcam (OpenCV)
+         │
+         ▼
+[1] Détection Faciale + 5 Landmarks (InsightFace buffalo_s / buffalo_l)
+         │
+         ▼
+[2] Évaluation Anti-usurpation / Liveness (MobileNetV3 ONNX) ──▶ Échec ? ──▶ ALERTE SPOOF + Journal DENIED
+         │ (Succès)
+         ▼
+[3] Alignement 5 points (Transformée d'Umeyama ArcFace 112×112)
+         │
+         ▼
+[4] Extraction d'Embedding 512-d (Modèle custom ONNX ou InsightFace)
+         │
+         ▼
+[5] Appariement Cosinus (Galerie biométrique sécurisée avec guard model_id)
+         │
+         ▼
+[6] Décision par Vote Glissant + Cooldown anti-rebond (AccessDecision)
+         │
+         ▼
+[7] Déclenchement Relais Porte + Historisation SQLite (AuditLog) + Dashboard Streamlit
+```
 
-**macOS / Linux**
+---
+
+## 📁 Structure du Projet
+
+```
+version_final/
+├── app.py                       # Dashboard Web interactif Streamlit
+├── config.yaml                  # Configuration centrale (caméra, modèles, seuils)
+├── requirements.txt             # Dépendances Python
+├── README.md                    # Documentation complète
+├── .gitignore                   # Exclusions Git
+├── src/
+│   ├── __init__.py              # Définition du package
+│   ├── config.py                # Chargement et mise à jour de la configuration
+│   ├── camera.py                # Capture vidéo multi-OS (AVFoundation, DShow, V4L2)
+│   ├── align.py                 # Alignement facial 5 points (Umeyama 112×112)
+│   ├── embedder.py              # Wrapper ONNX Runtime pour recognizer personnalisé
+│   ├── face_engine.py           # Moteur unifié détection + reconnaissance
+│   ├── liveness.py              # Anti-spoofing passif ONNX + recadrage contextuel
+│   ├── gallery.py               # Gestion de la galerie avec protection model_id
+│   ├── matcher.py               # Calcul de similarité cosinus et seuillage
+│   ├── decision.py              # Filtrage temporel par vote majoritaire et cooldown
+│   ├── door.py                  # Contrôleur temporisé de gâche électrique / relais
+│   ├── audit_log.py             # Journalisation des événements dans SQLite
+│   └── pipeline.py              # Pipeline complet de bout en bout + overlay vidéo
+├── scripts/
+│   ├── run_realtime.py          # Exécution CLI temps réel avec worker asynchrone
+│   ├── enroll_user.py           # Enrôlement interactif par webcam
+│   ├── enroll_from_folders.py   # Enrôlement par lots à partir de dossiers d'images
+│   ├── calibrate_threshold.py   # Analyse ROC / FAR / FRR et calibration du seuil
+│   ├── collect_liveness_data.py # Collecte de données réelles et attaques pour liveness
+│   └── benchmark.py             # Mesure des latences et du FPS
+├── notebooks/
+│   └── liveness_training.ipynb  # Notebook Colab GPU pour entraîner le modèle anti-spoof
+├── tests/
+│   ├── test_core.py             # Tests unitaires pipeline, galerie, matcher, décision
+│   ├── test_liveness.py         # Tests unitaires recadrage et inférence liveness
+│   └── test_custom_embedder.py  # Tests unitaires alignement, embedder et model_id
+├── models/
+│   ├── buffalo_s/               # Poids pré-entraînés InsightFace
+│   ├── recognition/             # Modèles personnalisés (ex: my_model.onnx)
+│   └── liveness/                # Modèle anti-spoofing (antispoof.onnx)
+├── data/
+│   ├── enrollment/              # Fichiers de gabarits (gallery.npz)
+│   ├── own_dataset/             # Clichés d'enrôlement et sondes de test
+│   ├── liveness/                # Données brutes de collecte anti-spoofing
+│   └── access_log.sqlite        # Base SQLite des événements d'accès
+└── evaluation/results/          # Courbes ROC et métriques exportées
+```
+
+---
+
+## 🚀 Installation et Utilisation
+
+### 1. Environnement Virtuel
 ```bash
 python3 -m venv .venv
-source .venv/bin/activate
-```
-
-**Windows (CMD)**
-```cmd
-python -m venv .venv
-.venv\Scripts\activate.bat
-```
-
-**Windows (PowerShell)**
-```powershell
-python -m venv .venv
-.venv\Scripts\Activate.ps1
-```
-
-> If PowerShell blocks the script, run once: `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`
-
-### 2 — Install dependencies
-
-```bash
+source .venv/bin/activate       # macOS / Linux
+# .venv\Scripts\activate.bat    # Windows
 pip install -r requirements.txt
 ```
 
-**GPU acceleration (Windows / Linux):** swap the ONNX package and enable GPU in config:
-```bash
-pip uninstall onnxruntime
-pip install onnxruntime-gpu        # CUDA 11.8 → onnxruntime-gpu==1.17.*
-                                   # CUDA 12.x → onnxruntime-gpu==1.18.*+
-```
-Then set `model.use_gpu: true` in `config.yaml`.
-
----
-
-## 🚀 Usage
-
-All commands below work on **macOS, Linux, and Windows** (CMD or PowerShell).
-
-### ▶ Launch the Web Dashboard (recommended)
+### 2. Lancement du Dashboard (Recommandé)
 ```bash
 streamlit run app.py
 ```
-Then open http://localhost:8501 in your browser.
+Le dashboard offre :
+- **Dashboard** : statistiques journalières, KPI et graphiques d'activité.
+- **Gallery** : enrôlement direct via la webcam (avec validation de pose et qualité).
+- **Live Control** : flux vidéo en direct avec superposition visuelle (boxes, FPS, état porte, liveness).
+- **Audit Log** : consultation filtrable de l'historique et export CSV.
+- **Settings** : configuration dynamique des modèles, seuils, et activation du liveness.
 
-The dashboard includes:
-| Page | Description |
-|---|---|
-| 🏠 Dashboard | KPIs, today's stats, recent events chart |
-| 👥 Gallery | Enroll new users via webcam snapshots, remove users |
-| 🎥 Live Control | Real-time face recognition with live camera feed |
-| 📋 Audit Log | Filterable event table + CSV export |
-| ⚙️ Settings | Edit all config.yaml parameters from the UI |
-
-### ⌨️ CLI commands (alternative)
-
-### ⌨️ CLI commands (alternative)
-
-### Enroll users (webcam)
+### 3. Enrôlement en Ligne de Commande
 ```bash
-python scripts/enroll_user.py --name alice    # consent required
-python scripts/enroll_user.py --name bob
+python scripts/enroll_user.py --name "Ahmed" --n 15
 ```
 
-### Enroll from existing images (e.g. from Colab)
-Copy photos to `data/own_dataset/<person>/` then:
+### 4. Calibration du Seuil Biométrique
 ```bash
-python scripts/enroll_from_folders.py
-```
-
-### Calibrate the similarity threshold
-```bash
-# put impostors' photos in  data/own_dataset/_impostors/
 python scripts/calibrate_threshold.py --far 0.01 --write
 ```
 
-### Run real-time access control
+### 5. Collecte et Entraînement Liveness (Phase 2)
 ```bash
-python scripts/run_realtime.py          # press q to quit
+# Collecte des sessions réelles (live)
+python scripts/collect_liveness_data.py --label live --group session1
+
+# Collecte des attaques (spoof)
+python scripts/collect_liveness_data.py --label spoof --group phone_photo1
+python scripts/collect_liveness_data.py --label spoof --group print_photo1
 ```
+Entraînez ensuite sur Google Colab avec `notebooks/liveness_training.ipynb` puis placez `antispoof.onnx` et `antispoof.json` dans `models/liveness/`. Activez l'option dans **Settings** ou `config.yaml` (`liveness.enabled: true`).
 
-If your camera is not index 0:
-```bash
-python scripts/run_realtime.py --camera 1
-```
-
-### Benchmark (ms/frame + FPS)
-```bash
-python scripts/benchmark.py
-python scripts/benchmark.py --image path/to/photo.jpg   # static image, no webcam needed
-```
-
-### Unit tests (no camera or model needed)
-```bash
-pytest -q
-```
-
----
-
-## 🪟 Windows-specific notes
-
-| Issue | Fix |
-|---|---|
-| `insightface` fails to build | Install **Microsoft C++ Build Tools** (see Prerequisites) then retry |
-| Camera not detected | Check another app (Teams, Zoom…) is not locking the camera. Try `--camera 1` |
-| Camera permission denied | Windows Settings → Privacy → Camera → allow the terminal app |
-| PowerShell activation blocked | Run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` once |
-| `cv2.imshow` window freezes | Known on some Windows GPU drivers; run with `--camera 0` and avoid moving the window during inference |
-| `onnxruntime` GPU not found | Make sure CUDA is in `PATH`; reinstall `onnxruntime-gpu` matching your CUDA version |
-
----
-
-## 🍎 macOS-specific notes
-
-| Issue | Fix |
-|---|---|
-| Camera permission denied | System Settings → Privacy & Security → Camera → enable your terminal (Terminal / iTerm / VS Code / Cursor), then **quit and reopen** the app |
-| `insightface` build error | Run `xcode-select --install` first |
-| Metal GPU | Not supported by ONNX Runtime; keep `use_gpu: false` |
-
----
-
-## 📁 Project layout
-
-```
-src/
-  face_engine.py   # detection + 5-pt alignment + ArcFace embedding (InsightFace)
-  gallery.py       # enrolled templates (.npz)
-  matcher.py       # cosine similarity
-  decision.py      # multi-frame voting + cooldown
-  door.py          # simulated door relay
-  audit_log.py     # SQLite event log
-  liveness.py      # anti-spoofing stub (Phase 2)
-  pipeline.py      # end-to-end frame processing
-
-scripts/
-  enroll_user.py          # live webcam enrollment
-  enroll_from_folders.py  # batch enrollment from images
-  run_realtime.py         # real-time access control loop
-  calibrate_threshold.py  # ROC analysis + threshold selection
-  benchmark.py            # latency / FPS measurement
-
-data/           # git-ignored; gallery + images + SQLite log
-models/         # git-ignored; InsightFace weights (auto-downloaded)
-evaluation/results/  # ROC plots
-```
-
----
-
-## 📝 Notes
-
-- Only **embeddings** are stored in the gallery (no raw images kept at runtime).
-  Captured images (needed for threshold calibration) can be disabled with `--no-images`.
-- **Low FPS on CPU?** Use `buffalo_s`, raise `runtime.process_every` in `config.yaml`, or lower the camera resolution.
-- **Liveness** is a stub — a printed photo or phone screen is accepted until Phase 2 (anti-spoofing model).

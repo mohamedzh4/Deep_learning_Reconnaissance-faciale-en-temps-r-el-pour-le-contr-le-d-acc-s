@@ -64,6 +64,8 @@ def main():
         sys.exit("Nothing captured.")
     gallery_path = ROOT / cfg["paths"]["gallery"]
     gallery = Gallery.load(gallery_path)
+    gallery.check_model(engine.model_id)
+    gallery.model_id = engine.model_id
     gallery.add(args.name, embs[: cfg["enroll"]["n_templates"]])
     gallery.save(gallery_path)
     print(f"Enrolled '{args.name}' ({len(embs)} captures). Gallery size: {len(gallery)}")

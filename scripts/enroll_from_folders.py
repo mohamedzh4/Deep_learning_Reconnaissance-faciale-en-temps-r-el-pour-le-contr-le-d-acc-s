@@ -25,7 +25,7 @@ def main():
     args = ap.parse_args()
     cfg = load_config(args.config)
     engine = FaceEngine(cfg)
-    gallery = Gallery()
+    gallery = Gallery(model_id=engine.model_id)
     for pdir in sorted(p for p in (ROOT / cfg["paths"]["own_dataset"]).iterdir() if p.is_dir()):
         if pdir.name.startswith("_"):
             continue

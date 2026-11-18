@@ -101,7 +101,12 @@ st.markdown(f"""
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 html, body, [data-testid="stAppViewContainer"] {{
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: #0d1117;
+    background-color: #080c14;
+    background-image: 
+        radial-gradient(rgba(56, 189, 248, 0.12) 1.2px, transparent 1.2px),
+        radial-gradient(rgba(148, 163, 184, 0.05) 1px, transparent 1px);
+    background-size: 22px 22px, 11px 11px;
+    background-position: 0 0, 11px 11px;
     color: #c9d1d9;
 }}
 
@@ -175,11 +180,27 @@ html, body, [data-testid="stAppViewContainer"] {{
 .kpi-row {{ display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }}
 .kpi-card {{
     flex: 1; min-width: 140px;
-    background: #161b22; border: 1px solid #21262d; border-radius: 12px;
+    background: rgba(22, 27, 34, 0.75);
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    border-radius: 12px;
     padding: 18px 20px; display: flex; flex-direction: column; gap: 8px;
-    transition: border-color .2s;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    position: relative;
+    overflow: hidden;
+    transition: all .25s ease;
 }}
-.kpi-card:hover {{ border-color: #30363d; }}
+.kpi-card::before {{
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.5), transparent);
+}}
+.kpi-card:hover {{
+    border-color: rgba(56, 189, 248, 0.45);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), 0 0 15px rgba(56, 189, 248, 0.12);
+}}
 .kpi-value {{ font-size: 1.9rem; font-weight: 700; line-height: 1; }}
 .kpi-label {{ font-size: .78rem; color: #8b949e; font-weight: 500; text-transform: uppercase; letter-spacing: .5px; }}
 
@@ -279,6 +300,249 @@ input:focus, textarea:focus {{ border-color: #58a6ff !important; box-shadow: 0 0
 /* ── Progress bar ── */
 .stProgress > div > div {{ background: #58a6ff !important; border-radius: 4px; }}
 .stProgress > div {{ background: #21262d !important; border-radius: 4px; }}
+
+/* ── HERO BANNER WITH DOT MATRIX EFFECT & WEB IMAGE ── */
+.hero-matrix-card {{
+    position: relative;
+    border-radius: 18px;
+    padding: 38px 36px 32px;
+    overflow: hidden;
+    margin-bottom: 22px;
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    background: #090e1a;
+    box-shadow: 
+        0 20px 50px -12px rgba(0, 0, 0, 0.8),
+        0 0 35px -5px rgba(56, 189, 248, 0.22),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
+}}
+
+/* Big web photo with dark biometric grading */
+.hero-matrix-bg {{
+    position: absolute;
+    inset: 0;
+    background-image: 
+        linear-gradient(135deg, rgba(8, 12, 20, 0.92) 0%, rgba(15, 23, 42, 0.72) 50%, rgba(8, 12, 20, 0.94) 100%),
+        url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1600&q=80');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: saturate(1.25) contrast(1.15);
+    z-index: 1;
+}}
+
+/* Dot Matrix Screen Overlay */
+.hero-matrix-dots {{
+    position: absolute;
+    inset: 0;
+    background-image: 
+        radial-gradient(rgba(56, 189, 248, 0.42) 1.5px, transparent 1.5px),
+        radial-gradient(rgba(14, 165, 233, 0.18) 1px, transparent 1px);
+    background-size: 14px 14px, 7px 7px;
+    background-position: 0 0, 3.5px 3.5px;
+    pointer-events: none;
+    z-index: 2;
+}}
+
+/* Animated Cyber Scanline */
+.hero-matrix-scanline {{
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent 0%, rgba(56, 189, 248, 0.14) 50%, transparent 100%);
+    background-size: 100% 90px;
+    animation: scanlineSweep 5s linear infinite;
+    pointer-events: none;
+    z-index: 3;
+}}
+@keyframes scanlineSweep {{
+    0% {{ transform: translateY(-100%); }}
+    100% {{ transform: translateY(100%); }}
+}}
+
+/* Corner HUD Brackets */
+.hero-matrix-card::before {{
+    content: '';
+    position: absolute;
+    top: 10px; left: 10px; width: 22px; height: 22px;
+    border-top: 2px solid #38bdf8;
+    border-left: 2px solid #38bdf8;
+    z-index: 4;
+    pointer-events: none;
+}}
+.hero-matrix-card::after {{
+    content: '';
+    position: absolute;
+    bottom: 10px; right: 10px; width: 22px; height: 22px;
+    border-bottom: 2px solid #38bdf8;
+    border-right: 2px solid #38bdf8;
+    z-index: 4;
+    pointer-events: none;
+}}
+
+.hero-matrix-content {{
+    position: relative;
+    z-index: 5;
+}}
+
+.hero-chip {{
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 14px;
+    background: rgba(56, 189, 248, 0.12);
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    border-radius: 9999px;
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: #38bdf8;
+    letter-spacing: 0.9px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}}
+.hero-chip-dot {{
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #38bdf8;
+    box-shadow: 0 0 8px #38bdf8;
+    animation: blink 1.2s ease-in-out infinite;
+}}
+
+.hero-bold-title {{
+    font-size: 2.35rem;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.6px;
+    line-height: 1.15;
+    margin: 4px 0 10px;
+    text-shadow: 0 0 30px rgba(56, 189, 248, 0.3);
+}}
+.hero-bold-title span.cyan-glow {{
+    color: #38bdf8;
+    text-shadow: 0 0 18px rgba(56, 189, 248, 0.7);
+}}
+
+.hero-subtext {{
+    font-size: 0.92rem;
+    color: #94a3b8;
+    line-height: 1.5;
+    margin: 0 0 16px;
+    max-width: 680px;
+}}
+
+.hero-specs {{
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}}
+.spec-pill {{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    background: rgba(15, 23, 42, 0.75);
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 6px;
+    font-size: 0.75rem;
+    color: #cbd5e1;
+    font-weight: 500;
+}}
+
+/* ── FLUTED GLASS BUTTONS (VERRE CANNELÉ) ── */
+.st-key-btn_hero_gallery > button,
+.st-key-btn_hero_live > button {{
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 12px !important;
+    height: 56px !important;
+    padding: 0 24px !important;
+    font-size: 0.94rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.9px !important;
+    text-transform: uppercase !important;
+    border-radius: 14px !important;
+    
+    /* Authentic Fluted Glass (vertical parallel ribbed optical refraction) */
+    background: 
+        repeating-linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.12) 0px,
+            rgba(255, 255, 255, 0.02) 4px,
+            rgba(255, 255, 255, 0.22) 8px,
+            rgba(255, 255, 255, 0.02) 12px,
+            rgba(0, 0, 0, 0.22) 16px,
+            rgba(255, 255, 255, 0.12) 20px
+        ),
+        linear-gradient(135deg, rgba(15, 23, 42, 0.82) 0%, rgba(30, 41, 59, 0.65) 100%) !important;
+    
+    backdrop-filter: blur(20px) saturate(200%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(200%) !important;
+    
+    border: 1px solid rgba(88, 166, 255, 0.45) !important;
+    color: #f0f6fc !important;
+    
+    box-shadow: 
+        0 10px 30px 0 rgba(0, 0, 0, 0.5),
+        inset 0 1px 1px 0 rgba(255, 255, 255, 0.35),
+        inset 0 -1px 2px 0 rgba(0, 0, 0, 0.5),
+        0 0 16px rgba(56, 189, 248, 0.16) !important;
+        
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    overflow: hidden !important;
+    cursor: pointer !important;
+}}
+
+/* Light sheen reflection on hover */
+.st-key-btn_hero_gallery > button::after,
+.st-key-btn_hero_live > button::after {{
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: -120% !important;
+    width: 60% !important;
+    height: 100% !important;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.25),
+        transparent
+    ) !important;
+    transform: skewX(-25deg) !important;
+    transition: 0.65s !important;
+    pointer-events: none !important;
+}}
+
+.st-key-btn_hero_gallery > button:hover::after,
+.st-key-btn_hero_live > button:hover::after {{
+    left: 160% !important;
+}}
+
+/* Hover State - Add to Gallery (Electric Cyan Glow) */
+.st-key-btn_hero_gallery > button:hover {{
+    border-color: #38bdf8 !important;
+    box-shadow: 
+        0 14px 38px 0 rgba(0, 0, 0, 0.65),
+        0 0 28px rgba(56, 189, 248, 0.5),
+        inset 0 1px 2px 0 rgba(255, 255, 255, 0.6) !important;
+    transform: translateY(-2px) scale(1.01) !important;
+    color: #ffffff !important;
+}}
+
+/* Hover State - Live Camera Control (Neon Emerald Glow) */
+.st-key-btn_hero_live > button:hover {{
+    border-color: #34d399 !important;
+    box-shadow: 
+        0 14px 38px 0 rgba(0, 0, 0, 0.65),
+        0 0 28px rgba(52, 211, 153, 0.5),
+        inset 0 1px 2px 0 rgba(255, 255, 255, 0.6) !important;
+    transform: translateY(-2px) scale(1.01) !important;
+    color: #ffffff !important;
+}}
+
+.st-key-btn_hero_gallery > button:active,
+.st-key-btn_hero_live > button:active {{
+    transform: translateY(1px) scale(0.99) !important;
+}}
 </style>
 """, unsafe_allow_html=True)
 
@@ -300,7 +564,7 @@ def load_gal(cfg):  return Gallery.load(gal_path(cfg))
 
 
 @st.cache_resource
-def load_engine(model_name: str, use_gpu: bool):
+def load_engine(model_name: str, use_gpu: bool, recognizer: str = ""):
     from src.face_engine import FaceEngine
     return FaceEngine(fresh_cfg())
 
@@ -367,6 +631,9 @@ def _draw_enroll(frame, faces, n_cap, left, dur):
 cfg     = fresh_cfg()
 gallery = load_gal(cfg)
 
+if "nav_radio" not in st.session_state:
+    st.session_state.nav_radio = "Dashboard"
+
 with st.sidebar:
     # Logo
     st.markdown(f"""
@@ -381,6 +648,7 @@ with st.sidebar:
     page = st.radio(
         "nav",
         [lbl for lbl, _ in _NAV_PAGES],
+        key="nav_radio",
         label_visibility="collapsed",
     )
 
@@ -406,7 +674,42 @@ with st.sidebar:
 # PAGE — DASHBOARD
 # ═════════════════════════════════════════════════════════════════════════════
 if page == "Dashboard":
-    page_header("layout", "Dashboard", "Real-time overview of the access control system")
+    # ── Hero Section with Web Photo, Dot Matrix Effect & Live Specs ──────────
+    st.markdown(f"""
+    <div class="hero-matrix-card">
+        <div class="hero-matrix-bg"></div>
+        <div class="hero-matrix-dots"></div>
+        <div class="hero-matrix-scanline"></div>
+        <div class="hero-matrix-content">
+            <div class="hero-chip">
+                <span class="hero-chip-dot"></span>
+                <span>BIOMETRIC ACCESS DEFENSE MATRIX &bull; REAL-TIME SURVEILLANCE</span>
+            </div>
+            <div class="hero-bold-title">FACE ACCESS <span class="cyan-glow">CONTROL</span></div>
+            <div class="hero-subtext">
+                High-precision deep neural facial identification with real-time anti-spoofing surveillance & automated access dispatch.
+            </div>
+            <div class="hero-specs">
+                <span class="spec-pill">{_ico("cpu", 14, "#58a6ff")} ArcFace / MobileFaceNet</span>
+                <span class="spec-pill">{_ico("shield-check", 14, "#3fb950")} Neural Anti-Spoof</span>
+                <span class="spec-pill">{_ico("activity", 14, "#d2a8ff")} &lt; 15ms Inference</span>
+                <span class="spec-pill">{_ico("users", 14, "#38bdf8")} {len(gallery)} Enrolled User(s)</span>
+            </div>
+        </div>
+    </div>""", unsafe_allow_html=True)
+
+    # ── Two Action Buttons in Middle beside Title — Fluted Glass Style ───────
+    hb_c1, hb_c2 = st.columns(2, gap="medium")
+    with hb_c1:
+        if st.button("➕   ADD TO GALLERY", key="btn_hero_gallery", use_container_width=True):
+            st.session_state.nav_radio = "Gallery"
+            st.rerun()
+    with hb_c2:
+        if st.button("🎥   LIVE CAMERA CONTROL", key="btn_hero_live", use_container_width=True):
+            st.session_state.nav_radio = "Live Control"
+            st.rerun()
+
+    st.markdown('<div style="height: 18px;"></div>', unsafe_allow_html=True)
 
     k1, k2, k3, k4 = st.columns(4)
     kpi_card(k1, "users",       len(gallery),         "Enrolled Users", "#58a6ff")
@@ -479,7 +782,7 @@ elif page == "Gallery":
             st_txt = st.empty()
             fr_ph  = st.empty()
 
-            engine = load_engine(cfg["model"]["name"], cfg["model"]["use_gpu"])
+            engine = load_engine(cfg["model"]["name"], cfg["model"]["use_gpu"], cfg["model"].get("recognizer", ""))
             cap    = cv2.VideoCapture(int(enroll_cam))
 
             if not cap.isOpened():
@@ -734,6 +1037,31 @@ elif page == "Settings":
                                 index=0 if cfg["model"]["name"] == "buffalo_s" else 1)
         s_gpu    = c5.checkbox("Use GPU  (onnxruntime-gpu + CUDA)", value=bool(cfg["model"]["use_gpu"]))
         s_det    = c6.select_slider("Det. input size", [160, 320, 640], value=cfg["model"]["det_size"][0])
+        # ── Recognizer picker ─────────────────────────────────────────────────
+        _rec_dir  = ROOT / "models" / "recognition"
+        _rec_dir.mkdir(parents=True, exist_ok=True)
+        _rec_files = sorted(p.name for p in _rec_dir.glob("*.onnx"))
+        _DEFAULT_LABEL = "⬛ Default  (buffalo_s built-in)"
+        _rec_options   = [_DEFAULT_LABEL] + _rec_files
+
+        # find current selection
+        _cur_rec = cfg["model"].get("recognizer", "")
+        _cur_name = Path(_cur_rec).name if _cur_rec else ""
+        _rec_idx  = _rec_options.index(_cur_name) if _cur_name in _rec_options else 0
+
+        s_rec_choice = st.selectbox(
+            "Recognizer model",
+            _rec_options,
+            index=_rec_idx,
+            help="ONNX files found in models/recognition/. 'Default' uses the buffalo_s built-in recognizer.",
+        )
+        s_rec = (
+            ""
+            if s_rec_choice == _DEFAULT_LABEL
+            else f"models/recognition/{s_rec_choice}"
+        )
+        if not _rec_files:
+            st.caption("📂 No .onnx files found in `models/recognition/`. Drop your model there and refresh.")
 
         st.markdown(f'<div class="sect">{_ico("activity", 14, "#8b949e")} Matching & Voting</div>', unsafe_allow_html=True)
         c7, c8, c9 = st.columns(3)
@@ -748,20 +1076,72 @@ elif page == "Settings":
 
         s_ntpl = st.slider("Enrollment templates per person", 1, 30, cfg["enroll"]["n_templates"])
 
+        st.markdown(f'<div class="sect">{_ico("shield-check", 14, "#8b949e")} Liveness / Anti-Spoofing</div>', unsafe_allow_html=True)
+        s_liveness = st.checkbox(
+            "Enable Phase 2 liveness check (requires antispoof.onnx in models/liveness/)",
+            value=bool(cfg.get("liveness", {}).get("enabled", False)),
+            help="When enabled, faces that fail the liveness model are rejected even if they match an enrolled person.",
+        )
+        s_live_thr = st.slider(
+            "Liveness threshold (P(live) must exceed this)",
+            0.1, 0.99,
+            float(cfg.get("liveness", {}).get("threshold", 0.5)),
+            0.01,
+            disabled=not s_liveness,
+        )
+
         saved = st.form_submit_button("Save Settings", type="primary")
 
     if saved:
+        live_model_file = ROOT / cfg.get("liveness", {}).get("model", "models/liveness/antispoof.onnx")
+        actual_liveness = bool(s_liveness)
+        if actual_liveness and not live_model_file.exists():
+            st.warning(
+                f" Modèle '{live_model_file.name}' introuvable dans models/liveness/. "
+                "Le liveness a été automatiquement désactivé pour éviter que le pipeline plante. "
+                "Entraînez le modèle (notebooks/liveness_training.ipynb) et placez-le dans models/liveness/ pour l'activer."
+            )
+            actual_liveness = False
+
         new = {
             "camera":   {"index": int(s_cam_idx), "width": int(s_cam_w), "height": int(s_cam_h)},
-            "model":    {"name": s_model, "det_size": [s_det, s_det], "use_gpu": bool(s_gpu)},
+            "model":    {"name": s_model, "det_size": [s_det, s_det], "use_gpu": bool(s_gpu), "recognizer": s_rec},
             "matching": {"threshold": float(s_thr)},
             "decision": {"window": int(s_win), "min_votes": int(s_votes), "cooldown_s": int(s_cool)},
             "door":     {"open_seconds": int(s_door)},
             "runtime":  {"process_every": int(s_every)},
             "enroll":   {"n_templates": int(s_ntpl)},
+            "liveness": {
+                "enabled": actual_liveness,
+                "model": cfg.get("liveness", {}).get("model", "models/liveness/antispoof.onnx"),
+                "threshold": float(s_live_thr),
+                "size": cfg.get("liveness", {}).get("size", 128),
+                "crop_scale": cfg.get("liveness", {}).get("crop_scale", 2.0),
+            },
             "paths":    cfg["paths"],
         }
         with open(CFG_PATH, "w", encoding="utf-8") as f:
             yaml.dump(new, f, default_flow_style=False, allow_unicode=True, sort_keys=False)
         st.cache_resource.clear()
-        st.success("Settings saved. Reload the page to apply model changes.")
+
+        # ── If recognizer changed → gallery embeddings are incompatible ──────
+        old_rec = cfg["model"].get("recognizer", "")
+        if s_rec != old_rec:
+            gal_file = ROOT / cfg["paths"]["gallery"]
+            if gal_file.exists():
+                # Back up the old gallery before wiping it
+                import shutil
+                backup = gal_file.with_suffix(f".bak_{int(time.time())}.npz")
+                shutil.copy2(gal_file, backup)
+                gal_file.unlink()
+                st.warning(
+                    f"⚠️ Recognizer changed — gallery cleared automatically.\n\n"
+                    f"Embeddings from **{Path(old_rec).name or 'buffalo_s default'}** are not compatible "
+                    f"with **{Path(s_rec).name or 'buffalo_s default'}**.\n\n"
+                    f"A backup was saved to `{backup.name}`. "
+                    f"Please re-enroll all users in the **Gallery** page."
+                )
+            else:
+                st.info("Recognizer changed. No existing gallery to clear.")
+        else:
+            st.success("Settings saved. Reload the page to apply model changes.")

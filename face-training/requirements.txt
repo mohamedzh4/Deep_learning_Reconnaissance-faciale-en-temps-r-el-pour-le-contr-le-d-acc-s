@@ -1,0 +1,10 @@
+# Use a separate virtual environment from the access-control project (it pins numpy<2).
+torch>=2.3
+numpy>=1.24
+pillow>=10.0
+tqdm>=4.65
+matplotlib>=3.7
+kagglehub>=0.3
+onnx>=1.15
+onnxruntime>=1.17
+pytest>=7.0

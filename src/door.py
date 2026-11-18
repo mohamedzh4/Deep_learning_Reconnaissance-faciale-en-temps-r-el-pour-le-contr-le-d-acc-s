@@ -14,3 +14,4 @@ class DoorController:
     @property
     def is_open(self):
         return time.time() < self._until
+

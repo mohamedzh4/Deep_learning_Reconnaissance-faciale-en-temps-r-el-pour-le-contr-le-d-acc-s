@@ -1,25 +1,32 @@
 camera:
   index: 1
-  width: 640
-  height: 480
+  width: 1000
+  height: 1000
 model:
   name: buffalo_s
   det_size:
-  - 320
-  - 320
+  - 160
+  - 160
   use_gpu: false
+  recognizer: models/recognition/my_model.onnx
 matching:
   threshold: 0.4
 decision:
-  window: 5
-  min_votes: 3
-  cooldown_s: 5
+  window: 20
+  min_votes: 19
+  cooldown_s: 60
 door:
-  open_seconds: 3
+  open_seconds: 30
 runtime:
-  process_every: 2
+  process_every: 10
 enroll:
-  n_templates: 5
+  n_templates: 30
+liveness:
+  enabled: true
+  model: models/liveness/antispoof.onnx
+  threshold: 0.5
+  size: 128
+  crop_scale: 2.0
 paths:
   gallery: data/enrollment/gallery.npz
   own_dataset: data/own_dataset
