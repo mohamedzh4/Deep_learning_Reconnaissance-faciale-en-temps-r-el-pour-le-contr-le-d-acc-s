@@ -106,7 +106,7 @@ Le dashboard offre :
 
 ### 3. Enrôlement en Ligne de Commande
 ```bash
-python scripts/enroll_user.py --name "Ahmed" --n 15
+python scripts/enroll_user.py --name "zahar" --n 15
 ```
 
 ### 4. Calibration du Seuil Biométrique
